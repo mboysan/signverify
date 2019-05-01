@@ -1,5 +1,9 @@
 package tree;
 
+import hashing.HashUtils;
+import hashing.IHash;
+import hashing.SHA256HashImpl;
+
 public class HashNode {
 
     private HashNode parentNode;
@@ -8,30 +12,30 @@ public class HashNode {
 
     private int depth = 0;
 
-    protected byte[] hash;
+    private final IHash hash;
 
-    private int coverageStart;
-    private int coverageEnd;
-
-    HashNode(String event) {
+    HashNode(String event) throws Exception {
+        this.hash = HashUtils.createHash(event, SHA256HashImpl.class);
     }
 
-    HashNode(HashNode leftNode, HashNode rightNode) {
+    HashNode(HashNode leftNode, HashNode rightNode) throws Exception {
         this.leftNode = leftNode;
         this.rightNode = rightNode;
         leftNode.setParentNode(this);
         rightNode.setParentNode(this);
         this.depth = Math.max(leftNode.getDepth(), rightNode.getDepth()) + 1;
+
+        this.hash = HashUtils.mergeHashes(leftNode.hash, rightNode.hash);
+
     }
 
-    public boolean isLeafParent() {
-        return leftNode instanceof HashLeaf && rightNode instanceof HashLeaf;
+    public boolean isLeftNode() {
+        return parentNode != null && this.equals(parentNode.leftNode);
     }
 
-    public boolean isLeaf() {
-        return leftNode == null && rightNode == null;
+    public boolean isRightNode() {
+        return parentNode != null && this.equals(parentNode.rightNode);
     }
-
 
     public HashNode getParentNode() {
         return parentNode;
@@ -45,16 +49,8 @@ public class HashNode {
         return leftNode;
     }
 
-    public void setLeftNode(HashNode leftNode) {
-        this.leftNode = leftNode;
-    }
-
     public HashNode getRightNode() {
         return rightNode;
-    }
-
-    public void setRightNode(HashNode rightNode) {
-        this.rightNode = rightNode;
     }
 
     public int getDepth() {
@@ -63,5 +59,13 @@ public class HashNode {
 
     public void setDepth(int depth) {
         this.depth = depth;
+    }
+
+    public IHash getHash() {
+        return hash;
+    }
+
+    public boolean isSameHash(IHash hash) {
+        return this.hash.equals(hash);
     }
 }
