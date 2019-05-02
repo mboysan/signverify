@@ -15,7 +15,7 @@ public class HashNode {
     private final IHash hash;
 
     HashNode(String event) throws Exception {
-        this.hash = HashUtils.createHash(event, SHA256HashImpl.class);
+        this.hash = HashUtils.createHash(event);
     }
 
     HashNode(HashNode leftNode, HashNode rightNode) throws Exception {

@@ -65,7 +65,7 @@ public class HashTree {
     }
 
     private HashLeaf findLeaf(String event) throws Exception {
-        HashLeaf leaf = leaves.get(HashUtils.createHash(event, SHA256HashImpl.class).toString());
+        HashLeaf leaf = leaves.get(HashUtils.createHash(event).toString());
         if (leaf == null) {
             throw new HashNotFoundException("Hash with the event not found: " + event);
         }
