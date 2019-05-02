@@ -7,12 +7,12 @@ import java.util.stream.Stream;
 
 import static org.junit.Assert.assertTrue;
 
-public abstract class AbstractHashTreeTestBase {
+abstract class AbstractHashTreeTestBase {
 
-    HashTree createHashTree(int size, String eventStrPrefix) throws Exception {
+    HashTree createHashTree(List<String> events) throws Exception {
         HashTree.HashTreeBuilder treeBuilder = HashTree.builder();
-        for (int i = 0; i < size; i++) {
-            treeBuilder.appendEvent(eventStrPrefix + i);
+        for (String event : events) {
+            treeBuilder.appendEvent(event);
         }
         return treeBuilder.build();
     }
