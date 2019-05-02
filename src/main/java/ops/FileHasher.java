@@ -3,6 +3,7 @@ package ops;
 import hashing.IHash;
 import tree.HashTreeAggregator;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -15,6 +16,10 @@ public class FileHasher {
     private static final int DEFAULT_CHUNK_SIZE = 4;
 
     private final IHash fileHash;
+
+    public FileHasher(File file) throws Exception {
+        this(file.getPath());
+    }
 
     public FileHasher(String pathToFile) throws Exception {
         this(pathToFile, DEFAULT_CHUNK_SIZE);
