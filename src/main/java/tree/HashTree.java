@@ -37,6 +37,14 @@ public class HashTree {
         }
     }
 
+    private void merge(HashTree other) throws Exception {
+        if (other == null) {
+            return;
+        }
+        addNode(other.getRoot());
+        this.leaves.putAll(other.leaves);
+    }
+
     private HashTree construct() throws Exception {
         if (nodeStack.isEmpty()) {
             throw new IllegalStateException("Construction failed: There are no items in the tree.");
@@ -146,18 +154,34 @@ public class HashTree {
     public static class HashTreeBuilder {
 
         private HashTree hashTree;
+        private boolean isBuilt = false;
 
         private HashTreeBuilder(){
             this.hashTree = new HashTree();
         }
 
         public HashTreeBuilder appendEvent(String event) throws Exception {
+            validateAction();
             hashTree.addNode(new HashLeaf(event));
             return this;
         }
 
+        public HashTreeBuilder mergeTree(HashTree treeToMerge) throws Exception {
+            validateAction();
+            hashTree.merge(treeToMerge);
+            return this;
+        }
+
         public HashTree build() throws Exception {
+            validateAction();
+            isBuilt = true;
             return hashTree.construct();
+        }
+
+        private void validateAction() {
+            if (isBuilt) {
+                throw new IllegalStateException("Hash tree already built. Cannot operate on it anymore.");
+            }
         }
 
     }
