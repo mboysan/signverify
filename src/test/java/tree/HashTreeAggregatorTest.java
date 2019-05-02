@@ -52,7 +52,7 @@ public class HashTreeAggregatorTest extends AbstractHashTreeTestBase {
                 for (List<String> events : eventsToAggregate) {
                     aggr.aggregateEvents(events);
                 }
-                aggr.endAggregation();
+                aggr.endAndGetRootHash();
                 isEventsValid(aggr.getAggregatedTree(), eventsToValidate);
             }
         }

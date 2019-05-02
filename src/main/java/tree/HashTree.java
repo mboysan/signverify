@@ -1,6 +1,7 @@
 package tree;
 
 import exceptions.HashNotFoundException;
+import exceptions.TreeConstructionFailedException;
 import hashing.HashUtils;
 import hashing.IHash;
 import hashing.SHA256HashImpl;
@@ -47,7 +48,7 @@ public class HashTree {
 
     private HashTree construct() throws Exception {
         if (nodeStack.isEmpty()) {
-            throw new IllegalStateException("Construction failed: There are no items in the tree.");
+            throw new TreeConstructionFailedException("Construction failed: There are no items in the tree.");
         }
         // merge dangling nodes
         while (!nodeStack.isEmpty()) {
@@ -60,7 +61,7 @@ public class HashTree {
             HashNode newParent = new HashNode(parentLeft, parentRight);
             nodeStack.push(newParent);
         }
-        throw new IllegalStateException("Construction failed: The tree is in invalid state.");
+        throw new TreeConstructionFailedException("Construction failed: The tree is in invalid state.");
     }
 
     private HashLeaf findLeaf(String event) throws Exception {

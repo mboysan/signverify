@@ -1,5 +1,7 @@
 package tree;
 
+import hashing.IHash;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -17,7 +19,7 @@ public class HashTreeAggregator implements AutoCloseable {
         return this;
     }
 
-    public HashTree endAggregation() throws Exception {
+    public IHash endAndGetRootHash() throws Exception {
         HashTree.HashTreeBuilder treeBuilder = HashTree.builder();
         treeBuilder.mergeTree(aggregatedTree);
         for (Future<HashTree> htf : hashTreeFutures) {
@@ -25,7 +27,7 @@ public class HashTreeAggregator implements AutoCloseable {
         }
         aggregatedTree = treeBuilder.build();
         hashTreeFutures.clear();
-        return aggregatedTree;
+        return aggregatedTree.getRoot().getHash();
     }
 
     HashTree getAggregatedTree() {
