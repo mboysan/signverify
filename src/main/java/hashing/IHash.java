@@ -1,6 +1,8 @@
 package hashing;
 
-public interface IHash {
+import java.io.Serializable;
+
+public interface IHash extends Serializable {
     Object generateHash(String event) throws Exception;
     IHash mergeAndCreateNewHash(IHash hashToMerge) throws Exception;
 

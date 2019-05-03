@@ -43,7 +43,12 @@ public class HashTree {
         if (other == null) {
             return;
         }
-        leafCount += other.leafCount;
+        if (!(other.getRoot() instanceof HashLeaf)) {
+            /* if the root of the other tree to merge is a leaf, we do not append its leafCount
+               because it will be added in the addNode() method.
+             */
+            leafCount += other.leafCount;
+        }
         addNode(other.getRoot());
         this.nodeMap.putAll(other.nodeMap);
     }

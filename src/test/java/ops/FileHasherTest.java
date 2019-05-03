@@ -10,28 +10,21 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static util.TestUtils.*;
+import static util.TestUtils.createRandomFile;
 
 public class FileHasherTest {
 
     @Test
     public void testRandomFileHashingWithUniqueContent() throws Exception {
         FileHasher.CHUNK_SIZE = 4;
-        int totalEvents = getRng().nextInt(500) + 1;
-        List<String> contentList = Stream.generate(() -> UUID.randomUUID().toString())
-                .limit(totalEvents)
-                .collect(Collectors.toList());
-        String content = eventsAsLines(contentList);
-
         File file = new File("src/test/resources/tmp.log");
         try {
-            createFile(file.getPath(), content);
+            List<String> contentList = createRandomFile(file.getPath(), 1, 500);
 
             FileHasher fileHasher = new FileHasher(file);
             IHash actualHash = fileHasher.getFileHash();
@@ -61,13 +54,13 @@ public class FileHasherTest {
     @Test(expected = FileHashingFailedException.class)
     public void testFileHashingEmptyFile() throws Exception {
         File file = new File("src/test/resources/empty.txt");
-        new FileHasher(file.getPath());
+        new FileHasher(file);
     }
 
     @Test
     public void testFileHashingEmptyLines() throws Exception {
         File file = new File("src/test/resources/twoemptylines.txt");
-        FileHasher fileHasher = new FileHasher(file.getPath());
+        FileHasher fileHasher = new FileHasher(file);
         IHash actualHash = fileHasher.getFileHash();
 
         try(HashTreeAggregator aggr = new HashTreeAggregator()) {
@@ -86,10 +79,10 @@ public class FileHasherTest {
         File lineAtEnd = new File("src/test/resources/lineatend.txt");
         File noLineAtEnd = new File("src/test/resources/nolineatend.txt");
 
-        FileHasher fileHasher1 = new FileHasher(lineAtEnd.getPath());
+        FileHasher fileHasher1 = new FileHasher(lineAtEnd);
         IHash hash1 = fileHasher1.getFileHash();
 
-        FileHasher fileHasher2 = new FileHasher(noLineAtEnd.getPath());
+        FileHasher fileHasher2 = new FileHasher(noLineAtEnd);
         IHash hash2 = fileHasher2.getFileHash();
 
         assertNotEquals(hash1, hash2);

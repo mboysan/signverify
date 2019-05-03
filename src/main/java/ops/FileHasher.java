@@ -7,43 +7,59 @@ import tree.HashTreeAggregator;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 public class FileHasher {
 
     static int CHUNK_SIZE = 4;
     private final HashTree fileHashTree;
+    private final int prevEventCount;
 
     public FileHasher(File file) throws Exception {
-        this(file.getPath());
+        this(file, -1);
     }
 
-    FileHasher(String pathToFile) throws Exception {
-        fileHashTree = hashFile(pathToFile);
+    public FileHasher(File file, int prevEventCount) throws Exception {
+        this.prevEventCount = prevEventCount;
+        fileHashTree = hashFile(file);
     }
 
-    private HashTree hashFile(String pathToFile) throws Exception {
-        try(Stream<String> lines = Files.lines(Paths.get(pathToFile));
+    private HashTree hashFile(File file) throws Exception {
+        try(Stream<String> lines = Files.lines(file.toPath());
             HashTreeAggregator hashTreeAggregator = new HashTreeAggregator()) {
 
             EventCollector collector = new EventCollector(CHUNK_SIZE);
-            AtomicInteger lineN = new AtomicInteger();
+            AtomicInteger lineN = new AtomicInteger(0);
+            AtomicReference<Exception> catchedEx = new AtomicReference<>();
             lines.forEach(line -> {
-                collector.append(line);
-                if (collector.canCollect()) {
-                    hashTreeAggregator.aggregateEvents(collector.collectAndReset());
+                try {
+                    collector.append(line);
+                    if (lineN.incrementAndGet() == prevEventCount) {
+                        /* aggregate the events remaining dangling formed from the previous file.
+                           and the current aggregation and continue.
+                         */
+                        hashTreeAggregator.aggregateEvents(collector.collectAndReset());
+                        hashTreeAggregator.endAggregation();
+                    }
+                    if (collector.canCollect()) {
+                        hashTreeAggregator.aggregateEvents(collector.collectAndReset());
+                    }
+                } catch (Exception e) {
+                    catchedEx.set(e);
                 }
-                lineN.getAndIncrement();
             });
-            if (collector.hasRemaining()) {
-                hashTreeAggregator.aggregateEvents(collector.collectAndReset());
+            if (catchedEx.get() != null) {
+                throw new FileHashingFailedException(catchedEx.get());
             }
             if (lineN.get() == 0) {
                 throw new FileHashingFailedException("Cannot hash a file with empty content");
+            }
+            if (collector.hasRemaining()) {
+                hashTreeAggregator.aggregateEvents(collector.collectAndReset());
             }
             return hashTreeAggregator.endAggregation().getAggregatedTree();
         }

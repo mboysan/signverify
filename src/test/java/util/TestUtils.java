@@ -7,6 +7,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,8 +18,7 @@ public abstract class TestUtils {
     static {
         long seed = System.currentTimeMillis();
         System.out.println("SEED FOR RANDOM: " + seed);
-//        rng = new Random(seed);
-        rng = new Random(1556895844708L);
+        rng = new Random(seed);
     }
 
     public static Random getRng() {
@@ -41,12 +41,25 @@ public abstract class TestUtils {
         return Stream.of(events).flatMap(Collection::stream).collect(Collectors.toList());
     }
 
+    public static List<String> createRandomFile(String logPath, int minSize, int maxSize) throws IOException {
+        if (minSize <= 0 || maxSize < minSize) {
+            throw new IllegalArgumentException("min & max size have to be set properly");
+        }
+        int totalEvents = getRng().nextInt((maxSize - minSize) + 1) + minSize;
+        List<String> contentList = Stream.generate(() -> UUID.randomUUID().toString())
+                .limit(totalEvents)
+                .collect(Collectors.toList());
+        String content = eventsAsLines(contentList);
+        createFile(logPath, content);
+        return contentList;
+    }
+
     public static void createFile(String logPath, String content) throws IOException {
         Files.write(Paths.get(logPath), content.getBytes());
     }
 
     public static void appendToFile(String logPath, String content) throws IOException {
-        Files.write(Paths.get(logPath), content.getBytes(), StandardOpenOption.APPEND);
+        Files.write(Paths.get(logPath), (String.format("%n") + content).getBytes(), StandardOpenOption.APPEND);
     }
 
 

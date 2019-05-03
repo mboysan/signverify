@@ -1,10 +1,11 @@
 package tree;
 
-import exceptions.TreeConstructionFailedException;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class HashTreeAggregator implements AutoCloseable {
 
@@ -23,8 +24,7 @@ public class HashTreeAggregator implements AutoCloseable {
         HashTree.HashTreeBuilder treeBuilder = HashTree.builder();
         treeBuilder.mergeTree(aggregatedTree);
         for (Future<HashTree> htf : hashTreeFutures) {
-            HashTree ht;
-            ht = htf.get();
+            HashTree ht = htf.get();
             treeBuilder.mergeTree(ht);
         }
         aggregatedTree = treeBuilder.build();

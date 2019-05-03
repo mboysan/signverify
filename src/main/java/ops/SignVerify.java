@@ -1,23 +1,32 @@
 package ops;
 
+import hashing.IHash;
+
 import java.io.*;
 
 public class SignVerify {
 
-    public static Signature sign(File file) throws Exception {
-        return sign(file, true);
+    private final boolean allowAppend;
+    private final String hashAlgorithm;
+
+    public SignVerify(boolean allowAppend) {
+        this(allowAppend, "SHA-256");
     }
 
-    public static Signature sign(File file, boolean allowAppend) throws Exception {
-        return new Signature(new FileHasher(file.getPath()).getFileHash(), allowAppend);
+    public SignVerify(boolean allowAppend, String hashAlgorithm) {
+        this.allowAppend = allowAppend;
+        this.hashAlgorithm = hashAlgorithm;
     }
 
-    public static Signature signToFile(File fileToSign, File signatureFile) throws Exception {
-        return signToFile(fileToSign, signatureFile, true);
+    public Signature sign(File fileToSign) throws Exception {
+        FileHasher fileHasher = new FileHasher(fileToSign);
+        IHash fileHash = fileHasher.getFileHashTree().getRoot().getHash();
+        int eventCount = fileHasher.getFileHashTree().getLeafCount();
+        return new Signature(fileHash, eventCount, allowAppend);
     }
 
-    public static Signature signToFile(File fileToSign, File signatureFile, boolean allowAppend) throws Exception {
-        Signature signature = sign(fileToSign, allowAppend);
+    public Signature sign(File fileToSign, File signatureFile) throws Exception {
+        Signature signature = sign(fileToSign);
         try(FileOutputStream f = new FileOutputStream(signatureFile);
             ObjectOutputStream o = new ObjectOutputStream(f)) {
             o.writeObject(signature);
@@ -25,15 +34,15 @@ public class SignVerify {
         return signature;
     }
 
-    public static boolean verify(Signature signature, File fileToVerify) throws Exception {
-        FileHasher hasher = new FileHasher(fileToVerify);
+    public boolean verify(Signature signature, File fileToVerify) throws Exception {
+        FileHasher hasher = new FileHasher(fileToVerify, signature.getEventCount());
         if (signature.isAppendAllowed()) {
             return hasher.getFileHashTree().isValidEvent(signature.getEncryptedHash());
         }
         return signature.getEncryptedHash().equals(hasher.getFileHash());
     }
 
-    public static boolean verify(File signatureFile, File fileToVerify) throws Exception {
+    public boolean verify(File signatureFile, File fileToVerify) throws Exception {
         try(FileInputStream fi = new FileInputStream(signatureFile);
             ObjectInputStream oi = new ObjectInputStream(fi)) {
             Signature signature = (Signature) oi.readObject();
