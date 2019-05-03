@@ -1,6 +1,8 @@
 package ops;
 
+import exceptions.FileHashingFailedException;
 import hashing.IHash;
+import tree.HashTree;
 import tree.HashTreeAggregator;
 
 import java.io.File;
@@ -13,47 +15,70 @@ import java.util.stream.Stream;
 
 public class FileHasher {
 
-    private static final int DEFAULT_CHUNK_SIZE = 4;
-
-    private final IHash fileHash;
+    static int CHUNK_SIZE = 4;
+    private final HashTree fileHashTree;
 
     public FileHasher(File file) throws Exception {
         this(file.getPath());
     }
 
-    public FileHasher(String pathToFile) throws Exception {
-        this(pathToFile, DEFAULT_CHUNK_SIZE);
+    FileHasher(String pathToFile) throws Exception {
+        fileHashTree = hashFile(pathToFile);
     }
 
-    FileHasher(String pathToFile, int chunksToRead) throws Exception {
-        fileHash = hashFile(pathToFile, chunksToRead);
-    }
-
-    private IHash hashFile(String pathToFile, int chunksToRead) throws Exception {
+    private HashTree hashFile(String pathToFile) throws Exception {
         try(Stream<String> lines = Files.lines(Paths.get(pathToFile));
             HashTreeAggregator hashTreeAggregator = new HashTreeAggregator()) {
 
-            AtomicInteger numLinesRead = new AtomicInteger();
-            List<String> events = new ArrayList<>();
-
+            EventCollector collector = new EventCollector(CHUNK_SIZE);
+            AtomicInteger lineN = new AtomicInteger();
             lines.forEach(line -> {
-                events.add(line);
-                if (numLinesRead.incrementAndGet() == chunksToRead) {
-                    hashTreeAggregator.aggregateEvents(new ArrayList<>(events));
-                    events.clear();
-                    numLinesRead.set(0);
+                collector.append(line);
+                if (collector.canCollect()) {
+                    hashTreeAggregator.aggregateEvents(collector.collectAndReset());
                 }
+                lineN.getAndIncrement();
             });
-            if (events.size() > 0) {
-                // aggregate the remaining events
-                hashTreeAggregator.aggregateEvents(new ArrayList<>(events));
+            if (collector.hasRemaining()) {
+                hashTreeAggregator.aggregateEvents(collector.collectAndReset());
             }
-            return hashTreeAggregator.endAndGetRootHash();
+            if (lineN.get() == 0) {
+                throw new FileHashingFailedException("Cannot hash a file with empty content");
+            }
+            return hashTreeAggregator.endAggregation().getAggregatedTree();
+        }
+    }
+
+    private static class EventCollector {
+        List<String> lines = new ArrayList<>();
+        boolean canCollect = false;
+        final int chunkSize;
+        EventCollector(int chunkSize) {
+            this.chunkSize = chunkSize;
+        }
+        void append(String event) {
+            lines.add(event);
+            canCollect = lines.size() >= chunkSize;
+        }
+        boolean canCollect() {
+            return canCollect;
+        }
+        boolean hasRemaining() {
+            return lines.size() > 0 && lines.size() <= chunkSize;
+        }
+        List<String> collectAndReset() {
+            List<String> toCollect = lines;
+            lines = new ArrayList<>();
+            canCollect = false;
+            return toCollect;
         }
     }
 
     public IHash getFileHash() {
-        return this.fileHash;
+        return getFileHashTree().getRoot().getHash();
     }
 
+    public HashTree getFileHashTree() {
+        return fileHashTree;
+    }
 }

@@ -4,8 +4,10 @@ import exceptions.HashNotFoundException;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
+import static tree.ITreeTestUtils.createHashTree;
+import static util.TestUtils.createEvents;
 
-public class HashChainTest extends AbstractHashTreeTestBase {
+public class HashChainTest {
     @Test
     public void testHashValidationSuccessOnBalancedTree() throws Exception {
         HashTree hashTree = createHashTree(createEvents(8, "event"));

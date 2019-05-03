@@ -1,79 +1,98 @@
 package ops;
 
-import exceptions.TreeConstructionFailedException;
+import exceptions.FileHashingFailedException;
 import hashing.IHash;
+import org.junit.Ignore;
 import org.junit.Test;
 import tree.HashTreeAggregator;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static util.TestUtils.*;
 
 public class FileHasherTest {
 
     @Test
-    public void testFileHashingRegular() throws Exception {
-        File file = new File("src/test/resources/filehasher_test.txt");
-        FileHasher fileHasher = new FileHasher(file.getPath(), 4);
-        IHash actualHash = fileHasher.getFileHash();
+    public void testRandomFileHashingWithUniqueContent() throws Exception {
+        FileHasher.CHUNK_SIZE = 4;
+        int totalEvents = getRng().nextInt(500) + 1;
+        List<String> contentList = Stream.generate(() -> UUID.randomUUID().toString())
+                .limit(totalEvents)
+                .collect(Collectors.toList());
+        String content = eventsAsLines(contentList);
 
-        List<String> events1 = Stream.of(
-                "event1 -- chunk 0",
-                "event2",
-                "event3",
-                "event4"
-        ).collect(Collectors.toList());
-        List<String> events2 = Stream.of(
-                "event5 -- chunk 1",
-                "event6",
-                "event7",
-                "event8"
-        ).collect(Collectors.toList());
-        List<String> events3 = Stream.of(
-                "event9 -- chunk 2",
-                "event10"
-        ).collect(Collectors.toList());
-        IHash expectedHash = new HashTreeAggregator()
-                .aggregateEvents(events1)
-                .aggregateEvents(events2)
-                .aggregateEvents(events3)
-                .endAndGetRootHash();
+        File file = new File("src/test/resources/tmp.log");
+        try {
+            createFile(file.getPath(), content);
 
-        assertEquals(expectedHash, actualHash);
+            FileHasher fileHasher = new FileHasher(file);
+            IHash actualHash = fileHasher.getFileHash();
+
+            try(HashTreeAggregator aggr = new HashTreeAggregator()) {
+                List<String> toAggregate = new ArrayList<>();
+                for (int i = 0, l = 1; i < contentList.size(); i++, l++) {
+                    toAggregate.add(contentList.get(i));
+                    if(l == FileHasher.CHUNK_SIZE) {
+                        aggr.aggregateEvents(new ArrayList<>(toAggregate));
+                        toAggregate.clear();
+                        l = 0;
+                    }
+                }
+                if (toAggregate.size() > 0) {
+                    aggr.aggregateEvents(new ArrayList<>(toAggregate));
+                }
+                IHash expectedHash = aggr.endAggregation().getAggregatedTree().getRoot().getHash();
+
+                assertEquals(expectedHash, actualHash);
+            }
+        } finally {
+            Files.delete(file.toPath());
+        }
+    }
+
+    @Test(expected = FileHashingFailedException.class)
+    public void testFileHashingEmptyFile() throws Exception {
+        File file = new File("src/test/resources/empty.txt");
+        new FileHasher(file.getPath());
     }
 
     @Test
-    public void testFileHashingLargeChunk() throws Exception {
-        File file = new File("src/test/resources/filehasher_test.txt");
-        FileHasher fileHasher = new FileHasher(file.getPath(), 10);
+    public void testFileHashingEmptyLines() throws Exception {
+        File file = new File("src/test/resources/twoemptylines.txt");
+        FileHasher fileHasher = new FileHasher(file.getPath());
         IHash actualHash = fileHasher.getFileHash();
 
-        List<String> events1 = Stream.of(
-                "event1 -- chunk 0",
-                "event2",
-                "event3",
-                "event4",
-                "event5 -- chunk 1",
-                "event6",
-                "event7",
-                "event8",
-                "event9 -- chunk 2",
-                "event10"
-        ).collect(Collectors.toList());
-        IHash expectedHash = new HashTreeAggregator()
-                .aggregateEvents(events1)
-                .endAndGetRootHash();
+        try(HashTreeAggregator aggr = new HashTreeAggregator()) {
+            List<String> events = Stream.of("","").collect(Collectors.toList());
+            aggr.aggregateEvents(events);
 
-        assertEquals(expectedHash, actualHash);
+            IHash expectedHash = aggr.endAggregation().getAggregatedTree().getRoot().getHash();
+
+            assertEquals(expectedHash, actualHash);
+        }
     }
 
-    @Test(expected = TreeConstructionFailedException.class)
-    public void testFileHashingEmptyFile() throws Exception {
-        File file = new File("src/test/resources/empty.txt");
-        FileHasher fileHasher = new FileHasher(file.getPath());
+    @Ignore
+    @Test
+    public void testFileHashingLineAtEndAndNoLineAtEnd() throws Exception {
+        File lineAtEnd = new File("src/test/resources/lineatend.txt");
+        File noLineAtEnd = new File("src/test/resources/nolineatend.txt");
+
+        FileHasher fileHasher1 = new FileHasher(lineAtEnd.getPath());
+        IHash hash1 = fileHasher1.getFileHash();
+
+        FileHasher fileHasher2 = new FileHasher(noLineAtEnd.getPath());
+        IHash hash2 = fileHasher2.getFileHash();
+
+        assertNotEquals(hash1, hash2);
     }
 
 }

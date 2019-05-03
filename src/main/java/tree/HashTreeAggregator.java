@@ -1,6 +1,6 @@
 package tree;
 
-import hashing.IHash;
+import exceptions.TreeConstructionFailedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,18 +19,20 @@ public class HashTreeAggregator implements AutoCloseable {
         return this;
     }
 
-    public IHash endAndGetRootHash() throws Exception {
+    public HashTreeAggregator endAggregation() throws Exception {
         HashTree.HashTreeBuilder treeBuilder = HashTree.builder();
         treeBuilder.mergeTree(aggregatedTree);
         for (Future<HashTree> htf : hashTreeFutures) {
-            treeBuilder.mergeTree(htf.get());
+            HashTree ht;
+            ht = htf.get();
+            treeBuilder.mergeTree(ht);
         }
         aggregatedTree = treeBuilder.build();
         hashTreeFutures.clear();
-        return aggregatedTree.getRoot().getHash();
+        return this;
     }
 
-    HashTree getAggregatedTree() {
+    public HashTree getAggregatedTree() {
         return aggregatedTree;
     }
 

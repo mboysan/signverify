@@ -4,7 +4,6 @@ import exceptions.HashNotFoundException;
 import exceptions.TreeConstructionFailedException;
 import hashing.HashUtils;
 import hashing.IHash;
-import hashing.SHA256HashImpl;
 
 import java.util.*;
 
@@ -14,16 +13,18 @@ import java.util.*;
 public class HashTree {
 
     private Deque<HashNode> nodeStack = new ArrayDeque<>();
-    private Map<String, HashLeaf> leaves = new HashMap<>();
+    private Map<String, HashNode> nodeMap = new HashMap<>();
     private HashNode root;
+    private int leafCount = 0;
 
     private HashTree() {
     }
 
     private void addNode(HashNode node) throws Exception {
         if (node instanceof HashLeaf) {
-            leaves.put(node.getHash().toString(), (HashLeaf) node);
+            leafCount++;
         }
+        nodeMap.put(node.getHash().toString(), node);
         if (nodeStack.isEmpty()) {
             nodeStack.push(node);
         } else {
@@ -42,8 +43,9 @@ public class HashTree {
         if (other == null) {
             return;
         }
+        leafCount += other.leafCount;
         addNode(other.getRoot());
-        this.leaves.putAll(other.leaves);
+        this.nodeMap.putAll(other.nodeMap);
     }
 
     private HashTree construct() throws Exception {
@@ -64,12 +66,12 @@ public class HashTree {
         throw new TreeConstructionFailedException("Construction failed: The tree is in invalid state.");
     }
 
-    private HashLeaf findLeaf(String event) throws Exception {
-        HashLeaf leaf = leaves.get(HashUtils.createHash(event).toString());
-        if (leaf == null) {
-            throw new HashNotFoundException("Hash with the event not found: " + event);
+    private HashNode findNode(IHash hash) throws HashNotFoundException {
+        HashNode node = nodeMap.get(hash.toString());
+        if (node == null) {
+            throw new HashNotFoundException("[" + hash + "]");
         }
-        return leaf;
+        return nodeMap.get(hash.toString());
     }
 
     private void extractHashChain(HashNode node, List<IHash> chain) {
@@ -92,16 +94,24 @@ public class HashTree {
     }
 
     public List<IHash> extractHashChain(String eventToCheck) throws HashNotFoundException, Exception {
-        HashLeaf leaf = findLeaf(eventToCheck);
+        return extractHashChain(HashUtils.createHash(eventToCheck));
+    }
+
+    public List<IHash> extractHashChain(IHash eventHash) throws HashNotFoundException {
+        HashNode node = findNode(eventHash);
         List<IHash> hashes = new ArrayList<>();
-        extractHashChain(leaf, hashes);
+        extractHashChain(node, hashes);
         return hashes;
     }
 
     public boolean isValidEvent(String eventToCheck) throws Exception {
-        List<IHash> hashChain = extractHashChain(eventToCheck);
-        HashLeaf leaf = findLeaf(eventToCheck);
-        IHash mergedHash = leaf.getHash();
+        return isValidEvent(HashUtils.createHash(eventToCheck));
+    }
+
+    public boolean isValidEvent(IHash eventHash) throws Exception {
+        List<IHash> hashChain = extractHashChain(eventHash);
+        HashNode node = findNode(eventHash);
+        IHash mergedHash = node.getHash();
         for (IHash iHash : hashChain) {
             mergedHash = iHash.getPosition() == IHash.Position.RIGHT
                     ? HashUtils.mergeHashes(mergedHash, iHash)
@@ -113,6 +123,10 @@ public class HashTree {
 
     public HashNode getRoot() {
         return root;
+    }
+
+    public int getLeafCount() {
+        return leafCount;
     }
 
     private void visualize(HashNode node, int distFromRoot, StringBuilder sb) {

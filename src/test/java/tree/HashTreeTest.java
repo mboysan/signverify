@@ -3,8 +3,10 @@ package tree;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
+import static tree.ITreeTestUtils.createHashTree;
+import static util.TestUtils.createEvents;
 
-public class HashTreeTest extends AbstractHashTreeTestBase {
+public class HashTreeTest {
 
     @Test
     public void testOneElementTreeConstruction() throws Exception {

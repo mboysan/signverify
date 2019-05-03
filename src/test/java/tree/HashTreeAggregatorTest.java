@@ -1,13 +1,53 @@
 package tree;
 
 import exceptions.HashNotFoundException;
+import exceptions.TreeConstructionFailedException;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class HashTreeAggregatorTest extends AbstractHashTreeTestBase {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static tree.ITreeTestUtils.assertEventValid;
+import static tree.ITreeTestUtils.assertEventsValid;
+import static util.TestUtils.createEvents;
+import static util.TestUtils.flatten;
+
+public class HashTreeAggregatorTest {
+
+    @Test
+    public void testAggregateNullEvents() throws Exception {
+        try(HashTreeAggregator aggr = new HashTreeAggregator()) {
+            aggr.aggregateEvents(null);
+            aggr.endAggregation();
+            fail("Should have failed creating the tree!");
+        } catch (Exception e) {
+            assertTrue(e.getCause() instanceof NullPointerException);
+        }
+    }
+
+    @Test
+    public void testAggregateEmptyEvents() throws Exception {
+        try(HashTreeAggregator aggr = new HashTreeAggregator()) {
+            aggr.aggregateEvents(new ArrayList<>());
+            aggr.endAggregation();
+            fail("Should have failed creating the tree!");
+        } catch (Exception e) {
+            assertTrue(e.getCause() instanceof TreeConstructionFailedException);
+        }
+    }
+
+    @Test
+    public void testAggregateEmptyStringEvents() throws Exception {
+        try(HashTreeAggregator aggr = new HashTreeAggregator()) {
+            aggr.aggregateEvents(Stream.of("").collect(Collectors.toList()));
+            aggr.endAggregation();
+            assertEventValid(aggr.getAggregatedTree(), "");
+        }
+    }
 
     @Test
     public void testAggregateSuccessSimple() throws Exception {
@@ -52,8 +92,8 @@ public class HashTreeAggregatorTest extends AbstractHashTreeTestBase {
                 for (List<String> events : eventsToAggregate) {
                     aggr.aggregateEvents(events);
                 }
-                aggr.endAndGetRootHash();
-                isEventsValid(aggr.getAggregatedTree(), eventsToValidate);
+                aggr.endAggregation();
+                assertEventsValid(aggr.getAggregatedTree(), eventsToValidate);
             }
         }
     }
