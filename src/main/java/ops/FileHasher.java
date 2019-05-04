@@ -10,7 +10,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 public class FileHasher {
@@ -34,14 +33,12 @@ public class FileHasher {
 
             EventCollector collector = new EventCollector(CHUNK_SIZE);
             AtomicInteger lineN = new AtomicInteger(0);
-            AtomicReference<Exception> catchedEx = new AtomicReference<>();
             lines.forEach(line -> {
                 try {
                     collector.append(line);
                     if (lineN.incrementAndGet() == prevEventCount) {
                         /* aggregate the events remaining dangling formed from the previous file.
-                           and the current aggregation and continue.
-                         */
+                           and the current aggregation and continue. */
                         hashTreeAggregator.aggregateEvents(collector.collectAndReset());
                         hashTreeAggregator.endAggregation();
                     }
@@ -49,12 +46,9 @@ public class FileHasher {
                         hashTreeAggregator.aggregateEvents(collector.collectAndReset());
                     }
                 } catch (Exception e) {
-                    catchedEx.set(e);
+                    throw new RuntimeException(e);
                 }
             });
-            if (catchedEx.get() != null) {
-                throw new FileHashingFailedException(catchedEx.get());
-            }
             if (lineN.get() == 0) {
                 throw new FileHashingFailedException("Cannot hash a file with empty content");
             }
