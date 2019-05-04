@@ -4,6 +4,7 @@ import hashing.HashUtils;
 import hashing.IHash;
 
 import java.io.*;
+import java.util.List;
 
 public class SignVerify {
 
@@ -50,6 +51,14 @@ public class SignVerify {
             Signature signature = (Signature) oi.readObject();
             return verify(signature, fileToVerify);
         }
+    }
+
+    public List<IHash> hashChainForEvent(File file, String event) throws Exception {
+        return new FileHasher(file, hashAlgorithm).getFileHashTree().extractHashChain(event);
+    }
+
+    public String visualizeHashMap(File file) throws Exception {
+        return new FileHasher(file, hashAlgorithm).getFileHashTree().visualize();
     }
 
 }

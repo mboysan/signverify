@@ -61,7 +61,7 @@ public class HashTreeAggregator implements AutoCloseable {
 
         @Override
         public HashTree call() throws Exception {
-            HashTree.HashTreeBuilder tb = HashTree.builder();
+            HashTree.HashTreeBuilder tb = HashTree.builder(hashAlgorithm);
             for (String event : events) {
                 tb.appendEvent(event);
             }

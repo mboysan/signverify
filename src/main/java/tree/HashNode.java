@@ -20,51 +20,31 @@ public class HashNode {
     HashNode(HashNode leftNode, HashNode rightNode) throws Exception {
         this.leftNode = leftNode;
         this.rightNode = rightNode;
-        leftNode.setParentNode(this);
-        rightNode.setParentNode(this);
+        leftNode.parentNode = this;
+        rightNode.parentNode = this;
         this.depth = Math.max(leftNode.getDepth(), rightNode.getDepth()) + 1;
 
         this.hash = HashUtils.mergeHashes(leftNode.hash, rightNode.hash);
 
     }
 
-    public boolean isLeftNode() {
-        return parentNode != null && this.equals(parentNode.leftNode);
-    }
-
-    public boolean isRightNode() {
-        return parentNode != null && this.equals(parentNode.rightNode);
-    }
-
-    public HashNode getParentNode() {
+    HashNode getParentNode() {
         return parentNode;
     }
 
-    private void setParentNode(HashNode parentNode) {
-        this.parentNode = parentNode;
-    }
-
-    public HashNode getLeftNode() {
+    HashNode getLeftNode() {
         return leftNode;
     }
 
-    public HashNode getRightNode() {
+    HashNode getRightNode() {
         return rightNode;
     }
 
-    public int getDepth() {
+    int getDepth() {
         return depth;
-    }
-
-    public void setDepth(int depth) {
-        this.depth = depth;
     }
 
     public IHash getHash() {
         return hash;
-    }
-
-    public boolean isSameHash(IHash hash) {
-        return this.hash.equals(hash);
     }
 }

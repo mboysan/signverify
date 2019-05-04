@@ -2,13 +2,16 @@ package ops;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,12 +20,22 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static util.TestUtils.*;
 
-@Ignore
+@RunWith(Parameterized.class)
 public class SignVerifyTest {
+
+    @Parameterized.Parameters(name = "{index}: hashAlg({0})={1}")
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][] {
+                {"SHA-256"}, {"SHA-1"}, {"MD5"}
+        });
+    }
 
     private List<File> filesToDelete = new ArrayList<>();
     private File fileToSign = new File("src/test/resources/test.log");
     private File signatureFile = new File("src/test/resources/test.sig");
+
+    @Parameterized.Parameter(0)
+    public String hashAlgorithm;
 
     @Before
     public void setUp() throws Exception {
@@ -46,7 +59,7 @@ public class SignVerifyTest {
     public void testSignAndVerifyRandomFileAppendNotAllowed() throws Exception {
         createRandomFile(fileToSign.getPath(), 1, 100);
 
-        SignVerify sv = new SignVerify(false);
+        SignVerify sv = new SignVerify(false, hashAlgorithm);
 
         sv.sign(fileToSign, signatureFile);
 
@@ -60,7 +73,7 @@ public class SignVerifyTest {
     public void testSignAndVerifyRandomFileAppendAllowed() throws Exception {
         createRandomFile(fileToSign.getPath(), 1, 500);
 
-        SignVerify sv = new SignVerify(true);
+        SignVerify sv = new SignVerify(true, hashAlgorithm);
 
         sv.sign(fileToSign, signatureFile);
 
@@ -75,7 +88,7 @@ public class SignVerifyTest {
     public void testSignAndVerifyRandomFileAlterDataDeleteLine() throws Exception {
         createRandomFile(fileToSign.getPath(), 1, 500);
 
-        SignVerify sv = new SignVerify(false);
+        SignVerify sv = new SignVerify(false, hashAlgorithm);
 
         sv.sign(fileToSign, signatureFile);
 
@@ -87,7 +100,7 @@ public class SignVerifyTest {
     public void testSignAndVerifyRandomFileAlterDataChangeLine() throws Exception {
         createRandomFile(fileToSign.getPath(), 1, 500);
 
-        SignVerify sv = new SignVerify(false);
+        SignVerify sv = new SignVerify(false, hashAlgorithm);
 
         sv.sign(fileToSign, signatureFile);
 

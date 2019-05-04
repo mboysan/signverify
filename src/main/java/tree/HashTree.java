@@ -170,7 +170,7 @@ public class HashTree {
         return sb.toString();
     }
 
-    public static HashTreeBuilder builder() {
+    static HashTreeBuilder builder() {
         return new HashTreeBuilder();
     }
 
@@ -178,7 +178,7 @@ public class HashTree {
         return new HashTreeBuilder(hashAlgorithm);
     }
 
-    public static class HashTreeBuilder {
+    static class HashTreeBuilder {
 
         private HashTree hashTree;
         private boolean isBuilt = false;
@@ -190,19 +190,19 @@ public class HashTree {
             this.hashTree = new HashTree(hashAlgorithm);
         }
 
-        public HashTreeBuilder appendEvent(String event) throws Exception {
+        HashTreeBuilder appendEvent(String event) throws Exception {
             validateAction();
             hashTree.addNode(new HashLeaf(event, hashTree.hashAlgorithm));
             return this;
         }
 
-        public HashTreeBuilder mergeTree(HashTree treeToMerge) throws Exception {
+        HashTreeBuilder mergeTree(HashTree treeToMerge) throws Exception {
             validateAction();
             hashTree.merge(treeToMerge);
             return this;
         }
 
-        public HashTree build() throws Exception {
+        HashTree build() throws Exception {
             validateAction();
             isBuilt = true;
             return hashTree.construct();
