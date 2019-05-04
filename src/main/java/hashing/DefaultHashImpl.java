@@ -5,16 +5,19 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-public class SHA256HashImpl implements IHash {
+public class DefaultHashImpl implements IHash {
 
     private final byte[] hash;
     private Position position;
+    private final String algorithm;
 
-    public SHA256HashImpl(String event) throws NoSuchAlgorithmException {
+    DefaultHashImpl(String event, String algorithm) throws NoSuchAlgorithmException {
+        this.algorithm = algorithm;
         this.hash = generateHash(event);
     }
 
-    private SHA256HashImpl(byte[] hash) throws NoSuchAlgorithmException {
+    private DefaultHashImpl(byte[] hash, String algorithm) throws NoSuchAlgorithmException {
+        this.algorithm = algorithm;
         this.hash = generateHash(hash);
     }
 
@@ -24,19 +27,19 @@ public class SHA256HashImpl implements IHash {
     }
 
     private byte[] generateHash(byte[] mergedHash) throws NoSuchAlgorithmException {
-        return MessageDigest.getInstance("SHA-256").digest(mergedHash);
+        return MessageDigest.getInstance(algorithm).digest(mergedHash);
     }
 
     @Override
-    public SHA256HashImpl mergeAndCreateNewHash(IHash hashToMerge) throws NoSuchAlgorithmException {
-        if (!(hashToMerge instanceof SHA256HashImpl)) {
+    public DefaultHashImpl mergeAndCreateNewHash(IHash hashToMerge) throws NoSuchAlgorithmException {
+        if (!(hashToMerge instanceof DefaultHashImpl)) {
             throw new IllegalArgumentException("Merge failed: implementation classes do not match: " + hashToMerge.getClass());
         }
-        SHA256HashImpl toMerge = (SHA256HashImpl) hashToMerge;
+        DefaultHashImpl toMerge = (DefaultHashImpl) hashToMerge;
         byte[] mergedHash = new byte[this.hash.length + toMerge.hash.length];
         System.arraycopy(this.hash, 0, mergedHash, 0, this.hash.length);
         System.arraycopy(toMerge.hash, 0, mergedHash, this.hash.length, toMerge.hash.length);
-        SHA256HashImpl newHash = new SHA256HashImpl(mergedHash);
+        DefaultHashImpl newHash = new DefaultHashImpl(mergedHash, algorithm);
         setPosition(Position.LEFT);
         hashToMerge.setPosition(Position.RIGHT);
         return newHash;
@@ -54,10 +57,10 @@ public class SHA256HashImpl implements IHash {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof SHA256HashImpl)) {
+        if (!(obj instanceof DefaultHashImpl)) {
             return false;
         }
-        SHA256HashImpl other = (SHA256HashImpl) obj;
+        DefaultHashImpl other = (DefaultHashImpl) obj;
         return Arrays.equals(this.hash, other.hash);
     }
 

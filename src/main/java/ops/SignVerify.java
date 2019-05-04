@@ -19,10 +19,10 @@ public class SignVerify {
     }
 
     public Signature sign(File fileToSign) throws Exception {
-        FileHasher fileHasher = new FileHasher(fileToSign);
+        FileHasher fileHasher = new FileHasher(fileToSign, hashAlgorithm);
         IHash fileHash = fileHasher.getFileHashTree().getRoot().getHash();
         int eventCount = fileHasher.getFileHashTree().getLeafCount();
-        return new Signature(fileHash, eventCount, allowAppend);
+        return new Signature(fileHash, eventCount, allowAppend, hashAlgorithm);
     }
 
     public Signature sign(File fileToSign, File signatureFile) throws Exception {
@@ -35,7 +35,7 @@ public class SignVerify {
     }
 
     public boolean verify(Signature signature, File fileToVerify) throws Exception {
-        FileHasher hasher = new FileHasher(fileToVerify, signature.getEventCount());
+        FileHasher hasher = new FileHasher(fileToVerify, signature.getEventCount(), signature.getHashAlgorithm());
         if (signature.isAppendAllowed()) {
             return hasher.getFileHashTree().isValidEvent(signature.getEncryptedHash());
         }

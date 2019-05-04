@@ -1,6 +1,7 @@
 package ops;
 
 import exceptions.FileHashingFailedException;
+import hashing.HashUtils;
 import hashing.IHash;
 import tree.HashTree;
 import tree.HashTreeAggregator;
@@ -18,18 +19,22 @@ public class FileHasher {
     private final HashTree fileHashTree;
     private final int prevEventCount;
 
-    public FileHasher(File file) throws Exception {
-        this(file, -1);
+    FileHasher(File file) throws Exception {
+        this(file, HashUtils.getDefaultHashAlgorithm());
     }
 
-    public FileHasher(File file, int prevEventCount) throws Exception {
+    public FileHasher(File file, String hashAlgorithm) throws Exception {
+        this(file, -1, hashAlgorithm);
+    }
+
+    public FileHasher(File file, int prevEventCount, String hashAlgorithm) throws Exception {
         this.prevEventCount = prevEventCount;
-        fileHashTree = hashFile(file);
+        fileHashTree = hashFile(file, hashAlgorithm);
     }
 
-    private HashTree hashFile(File file) throws Exception {
+    private HashTree hashFile(File file, String hashAlgorithm) throws Exception {
         try(Stream<String> lines = Files.lines(file.toPath());
-            HashTreeAggregator hashTreeAggregator = new HashTreeAggregator()) {
+            HashTreeAggregator hashTreeAggregator = new HashTreeAggregator(hashAlgorithm)) {
 
             EventCollector collector = new EventCollector(CHUNK_SIZE);
             AtomicInteger lineN = new AtomicInteger(0);

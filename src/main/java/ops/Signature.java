@@ -9,11 +9,13 @@ public class Signature implements Serializable {
     private final IHash encryptedHash;
     private final boolean allowAppend;
     private final int eventCount;
+    private final String hashAlgorithm;
 
-    Signature(IHash encryptedHash, int eventCount, boolean allowAppend) {
+    Signature(IHash encryptedHash, int eventCount, boolean allowAppend, String hashAlgorithm) {
         this.encryptedHash = encryptedHash;
         this.eventCount = eventCount;
         this.allowAppend = allowAppend;
+        this.hashAlgorithm = hashAlgorithm;
     }
 
     IHash getEncryptedHash() {
@@ -28,12 +30,17 @@ public class Signature implements Serializable {
         return allowAppend;
     }
 
+    String getHashAlgorithm() {
+        return hashAlgorithm;
+    }
+
     @Override
     public String toString() {
         return "Signature{" +
                 "encryptedHash=" + encryptedHash +
                 ", allowAppend=" + allowAppend +
                 ", eventCount=" + eventCount +
+                ", hashAlgorithm='" + hashAlgorithm + '\'' +
                 '}';
     }
 }

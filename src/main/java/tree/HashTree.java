@@ -17,7 +17,10 @@ public class HashTree {
     private HashNode root;
     private int leafCount = 0;
 
-    private HashTree() {
+    private final String hashAlgorithm;
+
+    private HashTree(String hashAlgorithm) {
+        this.hashAlgorithm = hashAlgorithm;
     }
 
     private void addNode(HashNode node) throws Exception {
@@ -99,7 +102,7 @@ public class HashTree {
     }
 
     public List<IHash> extractHashChain(String eventToCheck) throws HashNotFoundException, Exception {
-        return extractHashChain(HashUtils.createHash(eventToCheck));
+        return extractHashChain(HashUtils.createHash(eventToCheck, hashAlgorithm));
     }
 
     public List<IHash> extractHashChain(IHash eventHash) throws HashNotFoundException {
@@ -110,7 +113,7 @@ public class HashTree {
     }
 
     public boolean isValidEvent(String eventToCheck) throws Exception {
-        return isValidEvent(HashUtils.createHash(eventToCheck));
+        return isValidEvent(HashUtils.createHash(eventToCheck, hashAlgorithm));
     }
 
     public boolean isValidEvent(IHash eventHash) throws Exception {
@@ -171,18 +174,25 @@ public class HashTree {
         return new HashTreeBuilder();
     }
 
+    public static HashTreeBuilder builder(String hashAlgorithm) {
+        return new HashTreeBuilder(hashAlgorithm);
+    }
+
     public static class HashTreeBuilder {
 
         private HashTree hashTree;
         private boolean isBuilt = false;
 
-        private HashTreeBuilder(){
-            this.hashTree = new HashTree();
+        private HashTreeBuilder() {
+            this(HashUtils.getDefaultHashAlgorithm());
+        }
+        private HashTreeBuilder(String hashAlgorithm){
+            this.hashTree = new HashTree(hashAlgorithm);
         }
 
         public HashTreeBuilder appendEvent(String event) throws Exception {
             validateAction();
-            hashTree.addNode(new HashLeaf(event));
+            hashTree.addNode(new HashLeaf(event, hashTree.hashAlgorithm));
             return this;
         }
 

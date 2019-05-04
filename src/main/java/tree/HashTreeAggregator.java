@@ -1,5 +1,7 @@
 package tree;
 
+import hashing.HashUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -12,7 +14,16 @@ public class HashTreeAggregator implements AutoCloseable {
     private final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     private final List<Future<HashTree>> hashTreeFutures = new ArrayList<>();
 
+    private final String hashAlgorithm;
     private HashTree aggregatedTree = null;
+
+    public HashTreeAggregator() {
+        this(HashUtils.getDefaultHashAlgorithm());
+    }
+
+    public HashTreeAggregator(String hashAlgorithm) {
+        this.hashAlgorithm = hashAlgorithm;
+    }
 
     public HashTreeAggregator aggregateEvents(List<String> events) {
         Future<HashTree> f = executor.submit(new TreeBuildJob(events));

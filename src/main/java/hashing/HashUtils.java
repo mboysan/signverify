@@ -2,14 +2,25 @@ package hashing;
 
 public class HashUtils {
 
-    public static Class<? extends IHash> defaultHasherImplClass = SHA256HashImpl.class;
+    static String defaultHashAlgorithm = "SHA-256";
 
-    public static IHash createHash(String event) throws Exception {
-        return createHash(event, defaultHasherImplClass);
+    public static String getDefaultHashAlgorithm() {
+        return defaultHashAlgorithm;
     }
 
-    public static IHash createHash(String event, Class<? extends IHash> hasherImplClass) throws Exception {
-        return hasherImplClass.getConstructor(String.class).newInstance(event);
+    public static IHash createHash(String event) throws Exception {
+        return createHash(event, defaultHashAlgorithm);
+    }
+
+    public static IHash createHash(String event, String hashAlgorithm) throws Exception {
+        switch (hashAlgorithm) {
+            case "SHA-256":
+            case "SHA-1":
+            case "MD5":
+                return new DefaultHashImpl(event, hashAlgorithm);
+            default:
+                throw new IllegalStateException("Hash algorithm not recognized: " + hashAlgorithm);
+        }
     }
 
     public static IHash mergeHashes(IHash hash1, IHash hash2) throws Exception {

@@ -2,7 +2,6 @@ package tree;
 
 import hashing.HashUtils;
 import hashing.IHash;
-import hashing.SHA256HashImpl;
 
 public class HashNode {
 
@@ -14,8 +13,8 @@ public class HashNode {
 
     private final IHash hash;
 
-    HashNode(String event) throws Exception {
-        this.hash = HashUtils.createHash(event);
+    HashNode(String event, String hashAlgorithm) throws Exception {
+        this.hash = HashUtils.createHash(event, hashAlgorithm);
     }
 
     HashNode(HashNode leftNode, HashNode rightNode) throws Exception {
