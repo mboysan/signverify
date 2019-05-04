@@ -1,5 +1,6 @@
 package ops;
 
+import hashing.HashUtils;
 import hashing.IHash;
 
 import java.io.*;
@@ -10,7 +11,7 @@ public class SignVerify {
     private final String hashAlgorithm;
 
     public SignVerify(boolean allowAppend) {
-        this(allowAppend, "SHA-256");
+        this(allowAppend, HashUtils.getDefaultHashAlgorithm());
     }
 
     public SignVerify(boolean allowAppend, String hashAlgorithm) {
@@ -30,6 +31,7 @@ public class SignVerify {
         try(FileOutputStream f = new FileOutputStream(signatureFile);
             ObjectOutputStream o = new ObjectOutputStream(f)) {
             o.writeObject(signature);
+            o.flush();
         }
         return signature;
     }

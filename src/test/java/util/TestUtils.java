@@ -1,5 +1,6 @@
 package util;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -8,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,6 +62,29 @@ public abstract class TestUtils {
 
     public static void appendToFile(String logPath, String content) throws IOException {
         Files.write(Paths.get(logPath), (String.format("%n") + content).getBytes(), StandardOpenOption.APPEND);
+    }
+
+    public static void alterFileDeleteRandomLine(String logPath) throws IOException {
+        File file = new File(logPath);
+        List<String> lines = Files.readAllLines(file.toPath());
+        Files.delete(file.toPath());
+        lines.remove(getRng().nextInt(lines.size()));
+        Files.write(file.toPath(), eventsAsLines(lines).getBytes());
+    }
+
+    public static void alterFileChangeRandomLine(String logPath) throws IOException {
+        File file = new File(logPath);
+        List<String> lines = Files.readAllLines(file.toPath());
+        Files.delete(file.toPath());
+        int lineToChange = getRng().nextInt(lines.size());
+        AtomicInteger currLine = new AtomicInteger();
+        lines = lines.stream().map(s -> {
+            if (currLine.incrementAndGet() == lineToChange) {
+                return s + "new change";
+            }
+            return s;
+        }).collect(Collectors.toList());
+        Files.write(file.toPath(), eventsAsLines(lines).getBytes());
     }
 
 
