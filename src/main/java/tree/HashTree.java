@@ -10,24 +10,24 @@ import java.util.*;
 /**
  * Merkle Tree implementation.
  */
-public class HashTree {
+public abstract class HashTree {
+
+    public static OperationMode OPERATION_MODE = OperationMode.MEM;
 
     private Deque<HashNode> nodeStack = new ArrayDeque<>();
-    private Map<String, HashNode> nodeMap = new HashMap<>();
     private HashNode root;
     private int leafCount = 0;
 
     private final String hashAlgorithm;
 
-    private HashTree(String hashAlgorithm) {
+    HashTree(String hashAlgorithm) {
         this.hashAlgorithm = hashAlgorithm;
     }
 
-    private void addNode(HashNode node) throws Exception {
+    void addNode(HashNode node) throws Exception {
         if (node instanceof HashLeaf) {
             leafCount++;
         }
-        nodeMap.put(node.getHash().toString(), node);
         if (nodeStack.isEmpty()) {
             nodeStack.push(node);
         } else {
@@ -42,7 +42,7 @@ public class HashTree {
         }
     }
 
-    private void merge(HashTree other) throws Exception {
+    void merge(HashTree other) throws Exception {
         if (other == null) {
             return;
         }
@@ -53,7 +53,6 @@ public class HashTree {
             leafCount += other.leafCount;
         }
         addNode(other.getRoot());
-        this.nodeMap.putAll(other.nodeMap);
     }
 
     private HashTree construct() throws Exception {
@@ -74,13 +73,7 @@ public class HashTree {
         throw new TreeConstructionFailedException("Construction failed: The tree is in invalid state.");
     }
 
-    private HashNode findNode(IHash hash) throws HashNotFoundException {
-        HashNode node = nodeMap.get(hash.toString());
-        if (node == null) {
-            throw new HashNotFoundException("[" + hash + "]");
-        }
-        return nodeMap.get(hash.toString());
-    }
+    abstract HashNode findNode(IHash hash) throws HashNotFoundException;
 
     private void extractHashChain(HashNode node, List<IHash> chain) {
         if (node == null) {
@@ -187,7 +180,16 @@ public class HashTree {
             this(HashUtils.getDefaultHashAlgorithm());
         }
         private HashTreeBuilder(String hashAlgorithm){
-            this.hashTree = new HashTree(hashAlgorithm);
+            switch (OPERATION_MODE) {
+                case CPU:
+                    this.hashTree = new HashTreeCpuImpl(hashAlgorithm);
+                    return;
+                case MEM:
+                    this.hashTree = new HashTreeMemImpl(hashAlgorithm);
+                    return;
+                default:
+                    throw new IllegalArgumentException("Operation mode not recognized!");
+            }
         }
 
         HashTreeBuilder appendEvent(String event) throws Exception {
@@ -214,5 +216,9 @@ public class HashTree {
             }
         }
 
+    }
+
+    public enum OperationMode {
+        MEM, CPU
     }
 }

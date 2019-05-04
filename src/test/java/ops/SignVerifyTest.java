@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import tree.HashTree;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,10 +24,11 @@ import static util.TestUtils.*;
 @RunWith(Parameterized.class)
 public class SignVerifyTest {
 
-    @Parameterized.Parameters(name = "{index}: hashAlg({0})={1}")
+    @Parameterized.Parameters(name = "{index}: hashAlg={0}, opMode={1}")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][] {
-                {"SHA-256"}, {"SHA-1"}, {"MD5"}
+                {"SHA-256", "MEM"}, {"SHA-1", "MEM"}, {"MD5", "MEM"},
+                {"SHA-256", "CPU"}, {"SHA-1", "CPU"}, {"MD5", "CPU"},
         });
     }
 
@@ -37,8 +39,12 @@ public class SignVerifyTest {
     @Parameterized.Parameter(0)
     public String hashAlgorithm;
 
+    @Parameterized.Parameter(1)
+    public String opMode;
+
     @Before
     public void setUp() throws Exception {
+        HashTree.OPERATION_MODE = HashTree.OperationMode.valueOf(opMode);
         fileToSign = new File("src/test/resources/test.log");
         signatureFile = new File("src/test/resources/test.sig");
         filesToDelete = Stream.of(fileToSign, signatureFile).collect(Collectors.toList());
