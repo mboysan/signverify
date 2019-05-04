@@ -174,7 +174,7 @@ public class HashTree {
         return new HashTreeBuilder();
     }
 
-    public static HashTreeBuilder builder(String hashAlgorithm) {
+    static HashTreeBuilder builder(String hashAlgorithm) {
         return new HashTreeBuilder(hashAlgorithm);
     }
 

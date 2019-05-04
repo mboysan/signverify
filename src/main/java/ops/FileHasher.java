@@ -34,7 +34,7 @@ public class FileHasher {
 
     private HashTree hashFile(File file, String hashAlgorithm) throws Exception {
         try(Stream<String> lines = Files.lines(file.toPath());
-            HashTreeAggregator hashTreeAggregator = new HashTreeAggregator(hashAlgorithm)) {
+            HashTreeAggregator hta = new HashTreeAggregator(hashAlgorithm)) {
 
             EventCollector collector = new EventCollector(CHUNK_SIZE);
             AtomicInteger lineN = new AtomicInteger(0);
@@ -42,13 +42,13 @@ public class FileHasher {
                 try {
                     collector.append(line);
                     if (lineN.incrementAndGet() == prevEventCount) {
-                        /* aggregate the events remaining dangling formed from the previous file.
+                        /* aggregate the events remaining dangling formed from the previous file
                            and the current aggregation and continue. */
-                        hashTreeAggregator.aggregateEvents(collector.collectAndReset());
-                        hashTreeAggregator.endAggregation();
+                        hta.aggregateEvents(collector.collectAndReset());
+                        hta.endAggregation();
                     }
                     if (collector.canCollect()) {
-                        hashTreeAggregator.aggregateEvents(collector.collectAndReset());
+                        hta.aggregateEvents(collector.collectAndReset());
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -58,9 +58,9 @@ public class FileHasher {
                 throw new FileHashingFailedException("Cannot hash a file with empty content");
             }
             if (collector.hasRemaining()) {
-                hashTreeAggregator.aggregateEvents(collector.collectAndReset());
+                hta.aggregateEvents(collector.collectAndReset());
             }
-            return hashTreeAggregator.endAggregation().getAggregatedTree();
+            return hta.endAggregation().getAggregatedTree();
         }
     }
 
