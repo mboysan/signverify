@@ -6,20 +6,20 @@ import java.io.Serializable;
 
 public class Signature implements Serializable {
 
-    private final IHash encryptedHash;
+    private final IHash fileHash;
     private final boolean allowAppend;
     private final int eventCount;
     private final String hashAlgorithm;
 
-    Signature(IHash encryptedHash, int eventCount, boolean allowAppend, String hashAlgorithm) {
-        this.encryptedHash = encryptedHash;
+    Signature(IHash fileHash, int eventCount, boolean allowAppend, String hashAlgorithm) {
+        this.fileHash = fileHash;
         this.eventCount = eventCount;
         this.allowAppend = allowAppend;
         this.hashAlgorithm = hashAlgorithm;
     }
 
-    IHash getEncryptedHash() {
-        return encryptedHash;
+    IHash getFileHash() {
+        return fileHash;
     }
 
     int getEventCount() {
@@ -37,7 +37,7 @@ public class Signature implements Serializable {
     @Override
     public String toString() {
         return "Signature{" +
-                "encryptedHash=" + encryptedHash +
+                "fileHash=" + fileHash +
                 ", allowAppend=" + allowAppend +
                 ", eventCount=" + eventCount +
                 ", hashAlgorithm='" + hashAlgorithm + '\'' +

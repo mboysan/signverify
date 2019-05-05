@@ -39,9 +39,9 @@ public final class SignVerify {
     public boolean verify(Signature signature, File fileToVerify) throws Exception {
         FileHasher hasher = new FileHasher(fileToVerify, signature.getEventCount(), signature.getHashAlgorithm());
         if (signature.isAppendAllowed()) {
-            return hasher.getFileHashTree().isValidEvent(signature.getEncryptedHash());
+            return hasher.getFileHashTree().isValidEvent(signature.getFileHash());
         }
-        return signature.getEncryptedHash().equals(hasher.getFileHash());
+        return signature.getFileHash().equals(hasher.getFileHash());
     }
 
     public boolean verify(File signatureFile, File fileToVerify) throws Exception {
