@@ -173,7 +173,7 @@ You can use it in your maven projects by adding my repository and adding this pr
         <repository>
             <id>project-common</id>
             <name>Project Common</name>
-            <url>https://raw.githubusercontent.com/mboysan/mvn-repo/master/</url>
+            <url>https://github.com/mboysan/mvn-repo/raw/master</url>
         </repository>
     </repositories>
     ...
