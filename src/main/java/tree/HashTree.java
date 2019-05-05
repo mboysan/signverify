@@ -167,7 +167,7 @@ public abstract class HashTree {
     }
 
     static HashTreeBuilder builder() {
-        return new HashTreeBuilder();
+        return builder(HashUtils.getDefaultHashAlgorithm());
     }
 
     static HashTreeBuilder builder(String hashAlgorithm) {
@@ -179,9 +179,6 @@ public abstract class HashTree {
         private HashTree hashTree;
         private boolean isBuilt = false;
 
-        private HashTreeBuilder() {
-            this(HashUtils.getDefaultHashAlgorithm());
-        }
         private HashTreeBuilder(String hashAlgorithm){
             switch (OPERATION_MODE) {
                 case CPU:

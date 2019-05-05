@@ -37,6 +37,6 @@ class HashTreeMemImpl extends HashTree {
         if (node == null) {
             throw new HashNotFoundException("[" + hash + "]");
         }
-        return nodeMap.get(hash.toString());
+        return node;
     }
 }

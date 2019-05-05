@@ -32,7 +32,7 @@ public class HashTreeAggregator implements AutoCloseable {
     }
 
     public HashTreeAggregator endAggregation() throws Exception {
-        HashTree.HashTreeBuilder treeBuilder = HashTree.builder();
+        HashTree.HashTreeBuilder treeBuilder = HashTree.builder(hashAlgorithm);
         treeBuilder.mergeTree(aggregatedTree);
         for (Future<HashTree> htf : hashTreeFutures) {
             HashTree ht = htf.get();
