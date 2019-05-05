@@ -187,4 +187,14 @@ You can use it in your maven projects by adding my repository and adding this pr
     ...
 ```
 
-Note that, I don't promise to keep it updated with this format.
+Note that, I don't promise to keep it updated in the repo.
+
+# Future Work
+
+Possible further improvements to make on the project:
+
+* Discard processing file content as String objects, instead, use byte arrays to improve security.
+* Support for large files.
+* Provide paralellization for CPU intensive Hash Tree implementation.
+* Security/protection for signature files.
+* A server/client based architecture? Maybe even a distributed hash processor?
