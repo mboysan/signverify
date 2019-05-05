@@ -15,6 +15,7 @@
 [INFO] 01:11:34:447 ee.ut.jbizur.role.bizur.BizurNode.lambda$start$0(): [member0] Node initialized and ready!
 [INFO] 01:11:34:447 ee.ut.jbizur.role.bizur.BizurNode.lambda$start$0(): [member2] Node initialized and ready!
 [INFO] 01:11:34:455 ee.ut.jbizur.util.IdUtils.<clinit>(): seed: 1552518694455
+event to test
 [INFO] 01:11:34:459 ee.ut.jbizur.role.bizur.BizurRun.electLeaderForBucket(): [member1] initializing election process on bucket idx=34
 [INFO] 01:11:34:459 ee.ut.jbizur.role.bizur.BizurRun.electLeaderForBucket(): [member0] initializing election process on bucket idx=36
 [DEBUG] 01:11:34:462 ee.ut.jbizur.role.Role.sendMessage(): OUT [member2] LeaderElectionRequest_NC{bucketIndex=33} NetworkCommand{contextId=0, msgId=622220807, senderId='member2', senderAddr=MockAddress{address='member2'} Address{}, receiverAddr=MockAddress{address='member0'} Address{}, tag=0, timeStamp=1552518694462, payload=null, isHandled=false, retryCount=1, nodeType='null'}
