@@ -79,7 +79,7 @@ public abstract class TestUtils {
         int lineToChange = getRng().nextInt(lines.size());
         AtomicInteger currLine = new AtomicInteger();
         lines = lines.stream().map(s -> {
-            if (currLine.incrementAndGet() == lineToChange) {
+            if (currLine.getAndIncrement() == lineToChange) {
                 return s + "new change";
             }
             return s;
