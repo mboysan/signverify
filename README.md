@@ -194,6 +194,8 @@ Note that, I don't promise to keep it updated in the repo.
 Possible further improvements to make on the project:
 
 * Discard processing file content as String objects, instead, use byte arrays to improve security.
+* Support for different file charsets other than UTF-8
+* Signing of non-unique file contents.
 * Support for large files.
 * Provide paralellization for CPU intensive Hash Tree implementation.
 * Security/protection for signature files.
