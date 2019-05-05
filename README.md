@@ -1,4 +1,4 @@
-## Description
+# Description
 
 This project is created to check the integrity of any regular file (e.g. a log file) with a signature created using
 binary hash trees (a.k.a Merkle Tree).
