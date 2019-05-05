@@ -75,7 +75,7 @@ public abstract class HashTree {
 
     abstract HashNode findNode(IHash hash) throws HashNotFoundException;
 
-    private void extractHashChain(HashNode node, List<IHash> chain) {
+    private void _extractHashChain(HashNode node, List<IHash> chain) {
         if (node == null) {
             return;
         }
@@ -91,7 +91,7 @@ public abstract class HashTree {
         if (parentLeft != null && !parentLeft.equals(node)) {
             chain.add(parentLeft.getHash());
         }
-        extractHashChain(parent, chain);
+        _extractHashChain(parent, chain);
     }
 
     public List<IHash> extractHashChain(String eventToCheck) throws HashNotFoundException, Exception {
@@ -101,7 +101,7 @@ public abstract class HashTree {
     public List<IHash> extractHashChain(IHash eventHash) throws HashNotFoundException {
         HashNode node = findNode(eventHash);
         List<IHash> hashes = new ArrayList<>();
-        extractHashChain(node, hashes);
+        _extractHashChain(node, hashes);
         return hashes;
     }
 
@@ -111,8 +111,7 @@ public abstract class HashTree {
 
     public boolean isValidEvent(IHash eventHash) throws Exception {
         List<IHash> hashChain = extractHashChain(eventHash);
-        HashNode node = findNode(eventHash);
-        IHash mergedHash = node.getHash();
+        IHash mergedHash = eventHash;
         for (IHash iHash : hashChain) {
             mergedHash = iHash.getPosition() == IHash.Position.RIGHT
                     ? HashUtils.mergeHashes(mergedHash, iHash)
@@ -147,7 +146,6 @@ public abstract class HashTree {
 
         HashNode leftNode = node.getLeftNode();
         if (leftNode != null) {
-//            String h = node.getHash().toString();
             for (int i = 0; i < distFromRoot * hashStrLength; i++) {
                 sb.append(" ");
             }
