@@ -54,9 +54,7 @@ Following is an example:
 java -jar signverify.jar hashchain ./testlog.txt "event to test"
 ```
 
-#### Visualize Tree
-
-**Note:** This is currently experimental only.
+#### Visualize Tree (experimental)
 
 You can also visualize the complete hash tree of a file.
 
@@ -127,6 +125,8 @@ java -jar signverify.jar hashchain ./testlog.txt "event to test" -out MD5
 ```
 
 ### Visualize Command
+
+**NB!** This feature is currently experimental.
 
 Options available for the command:
 
