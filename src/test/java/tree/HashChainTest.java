@@ -3,18 +3,32 @@ package tree;
 import exceptions.HashNotFoundException;
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.junit.Assert.assertTrue;
+import static tree.ITreeTestUtils.assertEventsValid;
 import static tree.ITreeTestUtils.createHashTree;
 import static util.TestUtils.createEvents;
 
 public class HashChainTest {
+
+    @Test
+    public void testHashValidationSuccessOnOneElementTree() throws Exception {
+        HashTree hashTree = HashTree.builder().appendEvent("event0").build();
+        assertTrue(hashTree.isValidEvent("event0"));
+    }
+
+    @Test(expected = HashNotFoundException.class)
+    public void testHashValidationFailureOnOneElementTree() throws Exception {
+        HashTree hashTree = HashTree.builder().appendEvent("event0").build();
+        hashTree.isValidEvent("non-existing-event");
+    }
+
     @Test
     public void testHashValidationSuccessOnBalancedTree() throws Exception {
-        HashTree hashTree = createHashTree(createEvents(8, "event"));
-        assertTrue(hashTree.isValidEvent("event0"));
-        assertTrue(hashTree.isValidEvent("event1"));
-        assertTrue(hashTree.isValidEvent("event6"));
-        assertTrue(hashTree.isValidEvent("event7"));
+        List<String> events = createEvents(8, "event");
+        HashTree hashTree = createHashTree(events);
+        assertEventsValid(hashTree, events);
     }
 
     @Test(expected = HashNotFoundException.class)
@@ -25,11 +39,9 @@ public class HashChainTest {
 
     @Test
     public void testHashValidationSuccessOnUnbalancedTree() throws Exception {
-        HashTree hashTree = createHashTree(createEvents(11, "event"));
-        assertTrue(hashTree.isValidEvent("event0"));
-        assertTrue(hashTree.isValidEvent("event1"));
-        assertTrue(hashTree.isValidEvent("event9"));
-        assertTrue(hashTree.isValidEvent("event10"));
+        List<String> events = createEvents(11, "event");
+        HashTree hashTree = createHashTree(events);
+        assertEventsValid(hashTree, events);
     }
 
     @Test(expected = HashNotFoundException.class)
