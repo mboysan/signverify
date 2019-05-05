@@ -130,36 +130,41 @@ public abstract class HashTree {
         return leafCount;
     }
 
-    private void visualize(HashNode node, int distFromRoot, StringBuilder sb) {
+    private void visualize(HashNode node, int distFromRoot, StringBuilder sb, int hashStrLength) {
         if (node == null) {
             return;
         }
         if (distFromRoot == 1) {
-            sb.append(node.getHash());
+            sb.append(node.getHash().toString(), 0, hashStrLength);
         }
         HashNode rightNode = node.getRightNode();
         if (rightNode != null) {
-            sb.append("-").append(rightNode.getHash());
+            sb.append("-").append(rightNode.getHash().toString(), 0, hashStrLength);
         } else {
             sb.append(String.format("%n"));
         }
-        visualize(rightNode, distFromRoot + 1, sb);
+        visualize(rightNode, distFromRoot + 1, sb, hashStrLength);
 
         HashNode leftNode = node.getLeftNode();
         if (leftNode != null) {
-            String h = node.getHash().toString();
-            for (int i = 0; i < distFromRoot * h.length(); i++) {
+//            String h = node.getHash().toString();
+            for (int i = 0; i < distFromRoot * hashStrLength; i++) {
                 sb.append(" ");
             }
             sb.append("\\");
-            sb.append(leftNode.getHash());
+            sb.append(leftNode.getHash().toString(), 0, hashStrLength);
         }
-        visualize(leftNode, distFromRoot + 1, sb);
+        visualize(leftNode, distFromRoot + 1, sb, hashStrLength);
     }
 
-    public String visualize() {
+    public String visualize() throws Exception {
+        String testHashStr = HashUtils.createHash("test", hashAlgorithm).toString();
+        return visualize(testHashStr.length());
+    }
+
+    public String visualize(int hashStrLength) {
         StringBuilder sb = new StringBuilder();
-        visualize(getRoot(), 1, sb);
+        visualize(getRoot(), 1, sb, hashStrLength);
         return sb.toString();
     }
 

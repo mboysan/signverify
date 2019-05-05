@@ -65,9 +65,9 @@ public class SignVerifyTest {
     public void testSignAndVerifyRandomFileAppendNotAllowed() throws Exception {
         createRandomFile(fileToSign.getPath(), 1, 100);
 
-        SignVerify sv = new SignVerify(false, hashAlgorithm);
+        SignVerify sv = new SignVerify();
 
-        sv.sign(fileToSign, signatureFile);
+        sv.sign(fileToSign, signatureFile, false, hashAlgorithm);
 
         appendToFile(fileToSign.getPath(), eventsAsLines(createEvents(10, "newEvent")));
 
@@ -79,9 +79,9 @@ public class SignVerifyTest {
     public void testSignAndVerifyRandomFileAppendAllowed() throws Exception {
         createRandomFile(fileToSign.getPath(), 1, 500);
 
-        SignVerify sv = new SignVerify(true, hashAlgorithm);
+        SignVerify sv = new SignVerify();
 
-        sv.sign(fileToSign, signatureFile);
+        sv.sign(fileToSign, signatureFile,true, hashAlgorithm);
 
         appendToFile(fileToSign.getPath(), eventsAsLines(createEvents(127, "newEventSet1.")));
         assertTrue(sv.verify(signatureFile, fileToSign));
@@ -94,9 +94,9 @@ public class SignVerifyTest {
     public void testSignAndVerifyRandomFileAlterDataDeleteLine() throws Exception {
         createRandomFile(fileToSign.getPath(), 1, 500);
 
-        SignVerify sv = new SignVerify(false, hashAlgorithm);
+        SignVerify sv = new SignVerify();
 
-        sv.sign(fileToSign, signatureFile);
+        sv.sign(fileToSign, signatureFile,false, hashAlgorithm);
 
         alterFileDeleteRandomLine(fileToSign.getPath());
         assertFalse(sv.verify(signatureFile, fileToSign));
@@ -106,9 +106,9 @@ public class SignVerifyTest {
     public void testSignAndVerifyRandomFileAlterDataChangeLine() throws Exception {
         createRandomFile(fileToSign.getPath(), 1, 500);
 
-        SignVerify sv = new SignVerify(false, hashAlgorithm);
+        SignVerify sv = new SignVerify();
 
-        sv.sign(fileToSign, signatureFile);
+        sv.sign(fileToSign, signatureFile,false, hashAlgorithm);
 
         alterFileChangeRandomLine(fileToSign.getPath());
         assertFalse(sv.verify(signatureFile, fileToSign));
