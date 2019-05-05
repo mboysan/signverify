@@ -9,6 +9,13 @@ is modified or not.
 
 # Getting Started
 
+Following are the requirements to run the CLI tool:
+
+```
+java jdk (oracle/openjdk) >= 1.8
+maven
+```
+
 Clone the repository and run:
 
 ```bash
@@ -23,7 +30,7 @@ java -jar signverify.jar --help
 ```
 
 Assuming currnet working directory is ```./target```, create a non-empty log file ```testlog.txt```. You can also use 
-a sample log file contained in main resources, [testlog.txt](https://github.com/mboysan/guardtime-assignment/blob/master/src/main/resources/testlog.txt).
+a sample log file contained in main resources, [testlog.txt](https://github.com/mboysan/signverify/blob/master/src/main/resources/testlog.txt).
 
 Following are basic usage of the application.
 
@@ -160,10 +167,10 @@ java -jar signverify.jar -opmod CPU verify ./testlog.txt ./signature.sig
 
 You can use this project as a library as well with its useful API.
 
-Take a look at the [SignVerify](https://github.com/mboysan/guardtime-assignment/blob/master/src/main/java/ops/SignVerify.java)
+Take a look at the [SignVerify](https://github.com/mboysan/signverify/blob/master/src/main/java/ops/SignVerify.java)
 class for the available API operations.
 
-For some examples/samples, you can also checkout the [SignVerifyTest](https://github.com/mboysan/guardtime-assignment/blob/master/src/test/java/ops/SignVerifyTest.java)
+For some examples/samples, you can also checkout the [SignVerifyTest](https://github.com/mboysan/signverify/blob/master/src/test/java/ops/SignVerifyTest.java)
 class.
 
 You can use it in your maven projects by adding my repository and adding this project as a dependency like the following

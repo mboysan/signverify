@@ -14,7 +14,7 @@
 [INFO] 01:11:34:446 ee.ut.jbizur.role.bizur.BizurNode.lambda$start$0(): [member1] Node initialized and ready!
 [INFO] 01:11:34:447 ee.ut.jbizur.role.bizur.BizurNode.lambda$start$0(): [member0] Node initialized and ready!
 [INFO] 01:11:34:447 ee.ut.jbizur.role.bizur.BizurNode.lambda$start$0(): [member2] Node initialized and ready!
-[INFO] 01:11:34:455 ee.ut.jbizur.util.IdUtils.<clinit>(): seed: 1552518694455
+[INFO] 01:11:34:455 ee.ut.jbizur.ee.mboysan.signverify.util.IdUtils.<clinit>(): seed: 1552518694455
 event to test
 [INFO] 01:11:34:459 ee.ut.jbizur.role.bizur.BizurRun.electLeaderForBucket(): [member1] initializing election process on bucket idx=34
 [INFO] 01:11:34:459 ee.ut.jbizur.role.bizur.BizurRun.electLeaderForBucket(): [member0] initializing election process on bucket idx=36

@@ -30,7 +30,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>HashCLI</mainClass>
+                            <mainClass>ee.mboysan.signverify.HashCLI</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
