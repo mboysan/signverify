@@ -22,8 +22,8 @@ mv signverify-1.0-SNAPSHOT-jar-with-dependencies.jar signverify.jar
 java -jar signverify.jar --help
 ```
 
-Create a non-empty log file in the ```./target``` directory called ```testlog.txt```. And change the working directory
-to target: ```cd ./target```.
+Assuming currnet working directory is ```./target```, create a non-empty log file ```testlog.txt```. You can also use 
+a sample log file contained in main resources, [testlog.txt](https://github.com/mboysan/guardtime-assignment/blob/master/src/main/resources/testlog.txt).
 
 Following are basic usage of the application.
 
