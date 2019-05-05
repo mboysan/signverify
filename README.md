@@ -165,3 +165,26 @@ class for the available API operations.
 
 For some examples/samples, you can also checkout the [SignVerifyTest](https://github.com/mboysan/guardtime-assignment/blob/master/src/test/java/ops/SignVerifyTest.java)
 class.
+
+You can use it in your maven projects by adding my repository and adding this project as a dependency like the following
+```xml
+    ...
+    <repositories>
+        <repository>
+            <id>project-common</id>
+            <name>Project Common</name>
+            <url>https://raw.githubusercontent.com/mboysan/mvn-repo/master/</url>
+        </repository>
+    </repositories>
+    ...
+    <dependencies>
+       <dependency>
+           <groupId>ee.mboysan</groupId>
+           <artifactId>signverify</artifactId>
+           <version>1.0-SNAPSHOT</version>
+       </dependency>
+    </dependencies>
+    ...
+```
+
+Note that, I don't promise to keep it updated with this format.
