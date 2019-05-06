@@ -57,6 +57,9 @@ You can try verifying the file after changing its contents. It should fail.
 You can verify if the log file contains a certain line/event by extracting the hash chain from the line to the 
 complete hash of the whole file. This is also called generating the audit proof.
 
+First element of the generated list is the event's hash (leaf hash). And the last element is the hash representing the 
+whole file (root hash).
+
 Following is an example:
 
 ```bash
@@ -118,6 +121,9 @@ java -jar signverify.jar verify ./testlog.txt ./signature.sig
 ```
 
 ### Hashchain Command
+
+The extracted hash chain is represented as a list of hash strings in hex format. First element of the generated list is 
+the event's hash (leaf hash). And the last element is the hash representing the whole file (root hash).
 
 A couple of different options exist for this command.
 

@@ -102,7 +102,8 @@ public abstract class HashTree {
         HashNode node = findNode(eventHash);
         List<IHash> hashes = new ArrayList<>();
         _extractHashChain(node, hashes);
-        hashes.add(0, eventHash);
+        hashes.add(0, eventHash);   // include leaf's hash as the first element
+        hashes.add(getRoot().getHash());   // include root's hash as the last element
         return hashes;
     }
 
@@ -115,13 +116,14 @@ public abstract class HashTree {
         if (hashChain == null || hashChain.get(0) == null || !hashChain.get(0).equals(eventHash)) {
             throw new HashNotFoundException("Hash is invalid: [" + eventHash + "]");
         }
-        IHash mergedHash = hashChain.remove(0);
+        IHash mergedHash = hashChain.remove(0); // leaf's hash
+        IHash rootHash = hashChain.remove(hashChain.size() - 1);
         for (IHash iHash : hashChain) {
             mergedHash = iHash.getPosition() == IHash.Position.RIGHT
                     ? HashUtils.mergeHashes(mergedHash, iHash)
                     : HashUtils.mergeHashes(iHash, mergedHash);
         }
-        return getRoot().getHash().equals(mergedHash);
+        return getRoot().getHash().equals(rootHash) && getRoot().getHash().equals(mergedHash);
     }
 
 
