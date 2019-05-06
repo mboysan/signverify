@@ -5,6 +5,10 @@ import ee.mboysan.signverify.hashing.IHash;
 
 import java.util.Optional;
 
+/**
+ * Performs CPU intensive tree operations.
+ * @see #_findNode(HashNode, IHash)
+ */
 class HashTreeCpuImpl extends HashTree {
 
 
@@ -20,6 +24,9 @@ class HashTreeCpuImpl extends HashTree {
         return _findNode(getRoot(), hash).orElseThrow(() -> new HashNotFoundException("[" + hash + "](2)"));
     }
 
+    /**
+     * depth-first search.
+     */
     private Optional<HashNode> _findNode(HashNode node, IHash hashToFind) {
         if (node == null) {
             return Optional.empty();

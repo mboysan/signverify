@@ -12,18 +12,33 @@ import java.util.*;
  */
 public abstract class HashTree {
 
+    /**
+     * Determines the operation mode of the tree.
+     * @see HashTreeCpuImpl
+     * @see HashTreeMemImpl
+     * @see OperationMode
+     */
     public static OperationMode OPERATION_MODE = OperationMode.MEM;
 
+    /** Stack to keep track of the dangling nodes/branches. */
     private Deque<HashNode> nodeStack = new ArrayDeque<>();
+
+    /** root of the tree. */
     private HashNode root;
+
+    /** number of leaves/events. */
     private int leafCount = 0;
 
+    /** hash algorithm for hashing operations. */
     private final String hashAlgorithm;
 
     HashTree(String hashAlgorithm) {
         this.hashAlgorithm = hashAlgorithm;
     }
 
+    /**
+     * adds a new node to the tree being built.
+     */
     void addNode(HashNode node) throws Exception {
         if (node instanceof HashLeaf) {
             leafCount++;
@@ -33,15 +48,20 @@ public abstract class HashTree {
         } else {
             HashNode prevNode = nodeStack.pop();
             if (prevNode.getDepth() == node.getDepth()) {
+                // merge nodes if they are of equal depth.
                 HashNode parent = new HashNode(prevNode, node);
                 addNode(parent);
             } else {
+                // wait for equal depth node.
                 nodeStack.push(prevNode);   // put it back
                 nodeStack.push(node);
             }
         }
     }
 
+    /**
+     * merges two trees.
+     */
     void merge(HashTree other) throws Exception {
         if (other == null) {
             return;
@@ -55,6 +75,9 @@ public abstract class HashTree {
         addNode(other.getRoot());
     }
 
+    /**
+     * constructs a hash tree from the {@link #nodeStack}.
+     */
     private HashTree construct() throws Exception {
         if (nodeStack.isEmpty()) {
             throw new TreeConstructionFailedException("Construction failed: There are no items in the tree.");
@@ -73,8 +96,17 @@ public abstract class HashTree {
         throw new TreeConstructionFailedException("Construction failed: The tree is in invalid state.");
     }
 
+    /**
+     * Finds a node that represents the given hash.
+     * @param hash hash to search.
+     * @return node representing the hash.
+     * @throws HashNotFoundException if node not found.
+     */
     abstract HashNode findNode(IHash hash) throws HashNotFoundException;
 
+    /**
+     * add hashes of the siblings starting from the leaf.
+     */
     private void _extractHashChain(HashNode node, List<IHash> chain) {
         if (node == null) {
             return;
@@ -94,10 +126,19 @@ public abstract class HashTree {
         _extractHashChain(parent, chain);
     }
 
+    /**
+     * Hashes the eventToCheck and calls {@link #extractHashChain(IHash)}.
+     */
     public List<IHash> extractHashChain(String eventToCheck) throws HashNotFoundException, Exception {
         return extractHashChain(HashUtils.createHash(eventToCheck, hashAlgorithm));
     }
 
+    /**
+     * Extracts the hash chain for a given event.
+     * @param eventHash leaf/node hash to extract hash chain for.
+     * @return a list of hashes from leaf hash to root hash. [leafHash, [c1,[c2,...]], rootHash]
+     * @throws HashNotFoundException if hash is not found.
+     */
     public List<IHash> extractHashChain(IHash eventHash) throws HashNotFoundException {
         HashNode node = findNode(eventHash);
         List<IHash> hashes = new ArrayList<>();
@@ -107,10 +148,19 @@ public abstract class HashTree {
         return hashes;
     }
 
+    /**
+     * Hashes the eventToCheck and calls {@link #isValidEvent(IHash)}.
+     */
     public boolean isValidEvent(String eventToCheck) throws Exception {
         return isValidEvent(HashUtils.createHash(eventToCheck, hashAlgorithm));
     }
 
+    /**
+     * Checks if a given eventHash is a member of the hash tree.
+     * @param eventHash hash of the event to check for validity.
+     * @return true if event is included in the tree, false otherwise.
+     * @throws Exception if hash not found or a problem occurs while checking for validity of the event.
+     */
     public boolean isValidEvent(IHash eventHash) throws Exception {
         List<IHash> hashChain = extractHashChain(eventHash);
         if (hashChain == null || hashChain.get(0) == null || !hashChain.get(0).equals(eventHash)) {
@@ -127,10 +177,16 @@ public abstract class HashTree {
     }
 
 
+    /**
+     * @return see {@link #root}.
+     */
     public HashNode getRoot() {
         return root;
     }
 
+    /**
+     * @return see {@link #leafCount}.
+     */
     public int getLeafCount() {
         return leafCount;
     }
@@ -172,10 +228,16 @@ public abstract class HashTree {
         return sb.toString();
     }
 
+    /**
+     * @return a new hash tree builder with the default hash algorithm.
+     */
     static HashTreeBuilder builder() {
         return builder(HashUtils.getDefaultHashAlgorithm());
     }
 
+    /**
+     * @return a new hash tree builder with the provided hash algorithm.
+     */
     static HashTreeBuilder builder(String hashAlgorithm) {
         return new HashTreeBuilder(hashAlgorithm);
     }
@@ -225,6 +287,10 @@ public abstract class HashTree {
     }
 
     public enum OperationMode {
-        MEM, CPU
+        /** Memory intensive. */
+        MEM,
+
+        /** CPU intensive. */
+        CPU
     }
 }

@@ -6,6 +6,9 @@ import ee.mboysan.signverify.hashing.IHash;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Memory intensive tree operations.
+ */
 class HashTreeMemImpl extends HashTree {
 
     private Map<String, HashNode> nodeMap = new HashMap<>();
