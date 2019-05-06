@@ -102,6 +102,7 @@ public abstract class HashTree {
         HashNode node = findNode(eventHash);
         List<IHash> hashes = new ArrayList<>();
         _extractHashChain(node, hashes);
+        hashes.add(0, eventHash);
         return hashes;
     }
 
@@ -111,7 +112,10 @@ public abstract class HashTree {
 
     public boolean isValidEvent(IHash eventHash) throws Exception {
         List<IHash> hashChain = extractHashChain(eventHash);
-        IHash mergedHash = eventHash;
+        if (hashChain == null || hashChain.get(0) == null || !hashChain.get(0).equals(eventHash)) {
+            throw new HashNotFoundException("Hash is invalid: [" + eventHash + "]");
+        }
+        IHash mergedHash = hashChain.remove(0);
         for (IHash iHash : hashChain) {
             mergedHash = iHash.getPosition() == IHash.Position.RIGHT
                     ? HashUtils.mergeHashes(mergedHash, iHash)
