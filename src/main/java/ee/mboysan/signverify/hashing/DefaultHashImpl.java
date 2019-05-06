@@ -5,6 +5,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
+/**
+ * Default hash wrapper implementation for working with java's {@link MessageDigest} libraries.
+ */
 public class DefaultHashImpl implements IHash {
 
     private final byte[] hash;
@@ -30,6 +33,11 @@ public class DefaultHashImpl implements IHash {
         return MessageDigest.getInstance(algorithm).digest(mergedHash);
     }
 
+    /**
+     * {@inheritDoc}
+     * <b>NB!</b> This method has the side-effect of modifying the position of this and the merged hash.
+     * @throws NoSuchAlgorithmException if no algorithm is found to use as hashing method.
+     */
     @Override
     public DefaultHashImpl mergeAndCreateNewHash(IHash hashToMerge) throws NoSuchAlgorithmException {
         if (!(hashToMerge instanceof DefaultHashImpl)) {

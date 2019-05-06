@@ -15,23 +15,48 @@ import java.util.stream.Stream;
 
 public class FileHasher {
 
-    static int CHUNK_SIZE = 4;
+    /**
+     * Default number of lines to read as chunks.
+     */
+    static int CHUNK_SIZE = 256;
+    /**
+     * The hash tree built.
+     */
     private final HashTree fileHashTree;
+    /**
+     * When appending to log files (append-only logs) are allowed, we need to take the previous line count of the
+     * file to create a consistent hash tree.
+     */
     private final int prevEventCount;
 
+    /**
+     * @see FileHasher#FileHasher(File, int, String)
+     */
     FileHasher(File file) throws Exception {
         this(file, HashUtils.getDefaultHashAlgorithm());
     }
 
+    /**
+     * @see FileHasher#FileHasher(File, int, String)
+     */
     public FileHasher(File file, String hashAlgorithm) throws Exception {
         this(file, -1, hashAlgorithm);
     }
 
+    /**
+     * @param file file to create a hash tree.
+     * @param prevEventCount see {@link #prevEventCount}.
+     * @param hashAlgorithm hash algorithm to use for building the hash tree.
+     * @throws Exception if a problem occurs when creating a hash tree for the file.
+     */
     public FileHasher(File file, int prevEventCount, String hashAlgorithm) throws Exception {
         this.prevEventCount = prevEventCount;
         fileHashTree = hashFile(file, hashAlgorithm);
     }
 
+    /**
+     * creates a hash tree from the given file and hash algorithm
+     */
     private HashTree hashFile(File file, String hashAlgorithm) throws Exception {
         try(Stream<String> lines = Files.lines(file.toPath());
             HashTreeAggregator hta = new HashTreeAggregator(hashAlgorithm)) {
@@ -64,6 +89,9 @@ public class FileHasher {
         }
     }
 
+    /**
+     * A helper class for collecting events based on the {@link #CHUNK_SIZE}.
+     */
     private static class EventCollector {
         List<String> lines = new ArrayList<>();
         boolean canCollect = false;
@@ -89,10 +117,16 @@ public class FileHasher {
         }
     }
 
+    /**
+     * @return hash obj of the file.
+     */
     public IHash getFileHash() {
         return getFileHashTree().getRoot().getHash();
     }
 
+    /**
+     * @return {@link #fileHashTree}.
+     */
     public HashTree getFileHashTree() {
         return fileHashTree;
     }

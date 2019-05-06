@@ -152,11 +152,6 @@ generating the hash tree. You can change this with one of the options in ```{SHA
 java -jar signverify.jar visualize ./testlog.txt --hash-algorithm MD5
 ```
 
-* **Writing the output to file:** You can write the created visualization to a file.
-```bash
-java -jar signverify.jar visualize ./testlog.txt -out ./visaulized.txt
-```
-
 * **Specifying the hash length:** You can specify the hash string length per each node as well.
 ```bash
 java -jar signverify.jar visualize ./testlog.txt -hl 6

@@ -179,11 +179,6 @@ public class HashCLI {
                     .dest("ha")
                     .choices("SHA-256", "MD5", "SHA1").setDefault("SHA-256")
                     .help("Specify hash algorithm to use");
-            parser.addArgument("-out", "--out-file")
-                    .dest("out")
-                    .type(File.class)
-                    .setDefault((Object) null)
-                    .help("Output file to write the visualized hash tree.");
             parser.addArgument("-hl", "--hash-length")
                     .dest("hl")
                     .type(Integer.class)
@@ -195,15 +190,10 @@ public class HashCLI {
         void process(Namespace ns) throws Exception {
             File file = (ns.<List<File>>get("logFile")).get(0);
             String hashAlg = ns.getString("ha");
-            File outFile = ns.get("out");
             int hashLength = ns.get("hl");
 
-            String visual = new SignVerify().visualizeHashMap(file, outFile, hashAlg, hashLength);
-
+            String visual = new SignVerify().visualizeHashMap(file, hashAlg, hashLength);
             System.out.println(visual);
-            if (outFile != null) {
-                System.out.println("output written to: " + visual);
-            }
         }
     }
 }

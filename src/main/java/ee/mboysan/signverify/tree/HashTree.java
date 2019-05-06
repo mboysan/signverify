@@ -8,7 +8,7 @@ import ee.mboysan.signverify.hashing.IHash;
 import java.util.*;
 
 /**
- * Merkle Tree implementation.
+ * Merkle Tree / Binary Hash tree implementation.
  */
 public abstract class HashTree {
 
