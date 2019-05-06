@@ -1,3 +1,6 @@
+[![Build Status](https://api.travis-ci.com/mboysan/signverify.svg?branch=master)](https://travis-ci.com/mboysan/signverify)
+
+
 # Description
 
 This project is created to check the integrity of any regular file (e.g. a log file) with a signature created using
